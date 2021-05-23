@@ -753,15 +753,16 @@ export default class Plx extends Component {
   }
 
   componentDidMount() {
+    // Get scroll manager singleton
+    this.scrollManager = new ScrollManager();
+
     if (this.scrollElement) {
       this.scrollElement.addEventListener('scroll', this.handleScrollChange);
     } else {
-      // Get scroll manager singleton
-      this.scrollManager = new ScrollManager();
       window.addEventListener('window-scroll', this.handleScrollChange);
     }
 
-    console.log('wookkkk');
+    console.log('wookkkk2');
 
     // Add listeners
     window.addEventListener('resize', this.handleResize);
