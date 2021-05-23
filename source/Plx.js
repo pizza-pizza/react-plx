@@ -524,7 +524,7 @@ function omit(object, keysToOmit) {
 
 // Main update function
 // Returns new state object based on props and scroll position
-function getNewState(scrollPosition, props, state, element) {
+function getNewState(scrollPosition, props, state, element, customMaxScroll) {
   const {
     animateWhenNotInViewport,
     disabled,
@@ -575,8 +575,8 @@ function getNewState(scrollPosition, props, state, element) {
   let lastSegmentScrolledBy = null;
   let maxScroll;
 
-  if (this.maxScroll) {
-    maxScroll = this.maxScroll;
+  if (props.maxScroll) {
+    maxScroll = props.maxScroll;
   } else {
     const bodyHeight = document.documentElement.scrollHeight || document.body.scrollHeight;
 
@@ -734,7 +734,6 @@ export default class Plx extends Component {
     // Custom scroll element & calculation
     this.scrollElement = props.scrollElement;
     this.calculateScrollPosition = props.calculateScrollPosition;
-    this.maxScroll = props.maxScroll;
 
     // Binding handlers
     this.handleScrollChange = this.handleScrollChange.bind(this);
@@ -762,7 +761,7 @@ export default class Plx extends Component {
       window.addEventListener('window-scroll', this.handleScrollChange);
     }
 
-    console.log('wookkkk2');
+    console.log('wookkkk3');
 
     // Add listeners
     window.addEventListener('resize', this.handleResize);
