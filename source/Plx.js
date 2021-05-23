@@ -573,8 +573,15 @@ function getNewState(scrollPosition, props, state, element) {
   const segments = [];
   let isInSegment = false;
   let lastSegmentScrolledBy = null;
-  const bodyHeight = document.documentElement.scrollHeight || document.body.scrollHeight;
-  const maxScroll = bodyHeight - window.innerHeight;
+  let maxScroll;
+
+  if (this.maxScroll) {
+    maxScroll = this.maxScroll;
+  } else {
+    const bodyHeight = document.documentElement.scrollHeight || document.body.scrollHeight;
+
+    maxScroll = bodyHeight - window.innerHeight;
+  }
 
   for (let i = 0; i < parallaxData.length; i++) {
     const {
@@ -724,6 +731,11 @@ export default class Plx extends Component {
   constructor(props) {
     super();
 
+    // Custom scroll element & calculation
+    this.scrollElement = props.scrollElement;
+    this.calculateScrollPosition = props.calculateScrollPosition;
+    this.maxScroll = props.maxScroll;
+
     // Binding handlers
     this.handleScrollChange = this.handleScrollChange.bind(this);
     this.handleResize = this.handleResize.bind(this);
@@ -741,11 +753,17 @@ export default class Plx extends Component {
   }
 
   componentDidMount() {
-    // Get scroll manager singleton
-    this.scrollManager = new ScrollManager();
+    if (this.scrollElement) {
+      this.scrollElement.addEventListener('scroll', this.handleScrollChange);
+    } else {
+      // Get scroll manager singleton
+      this.scrollManager = new ScrollManager();
+      window.addEventListener('window-scroll', this.handleScrollChange);
+    }
+
+    console.log('wookkkk');
 
     // Add listeners
-    window.addEventListener('window-scroll', this.handleScrollChange);
     window.addEventListener('resize', this.handleResize);
 
     this.update();
@@ -771,7 +789,12 @@ export default class Plx extends Component {
   }
 
   componentWillUnmount() {
-    window.removeEventListener('window-scroll', this.handleScrollChange);
+    if (this.scrollElement) {
+      this.scrollElement.removeEventListener('scroll', this.handleScrollChange);
+    } else {
+      window.removeEventListener('window-scroll', this.handleScrollChange);
+    }
+
     window.removeEventListener('resize', this.handleResize);
 
     clearTimeout(this.resizeDebounceTimeoutID);
@@ -806,7 +829,11 @@ export default class Plx extends Component {
   }
 
   handleScrollChange(e) {
-    this.update(e.detail.scrollPositionY);
+    if (this.calculateScrollPosition) {
+      this.update(this.calculateScrollPosition(e));
+    } else {
+      this.update(e.detail.scrollPositionY);
+    }
   }
 
   render() {
