@@ -275,6 +275,9 @@ function convertPropToPixels(propName, propValue, maxScroll, offset = 0) {
     propValueInPx = 0;
   }
 
+  //TODO
+  console.log(propName, propValueInPx);
+
   return propValueInPx;
 }
 
@@ -623,6 +626,8 @@ function getNewState(scrollPosition, props, state, element) {
     if (isScrolledByStart) {
       lastSegmentScrolledBy = i;
     }
+
+    console.log(scrollPosition, startInPx, endInPx);
 
     // If active segment exists, apply his properties
     if (scrollPosition >= startInPx && scrollPosition <= endInPx) {
