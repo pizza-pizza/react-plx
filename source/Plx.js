@@ -7,8 +7,8 @@ import ScrollManager from 'window-scroll-manager';
 const WINDOW_EXISTS = typeof window !== 'undefined';
 
 // Regex that checks for numbers in string
-// formatted as "{number}{unit}" where unit is "px", "vh", "%" or none
-const START_END_DURATION_REGEX = /^-?\d+(\.\d+)?(px|vh|%)?$/;
+// formatted as "{number}{unit}" where unit is "px", "vh", "vw", "%" or none
+const START_END_DURATION_REGEX = /^-?\d+(\.\d+)?(px|vh|vw|%)?$/;
 
 const DEFAULT_UNIT = 'px';
 const DEFAULT_ANGLE_UNIT = 'deg';
@@ -195,16 +195,20 @@ function getUnit(property, unit) {
   return propertyUnit;
 }
 
-// Takes string value (in px/vh/%) and returns number
+// Takes string value (in px/vh/vw/%) and returns number
 function getValueInPx(value, maxScroll) {
   const floatValue = parseFloat(value);
   const unit = value.match(START_END_DURATION_REGEX)[2] || null;
   const vh = window.innerHeight / 100;
+  const vw = window.innerWidth / 100;
   let valueInPx = value;
 
   switch (unit) {
     case 'vh':
       valueInPx = vh * floatValue;
+      break;
+    case 'vw':
+      valueInPx = vw * floatValue;
       break;
     case '%':
       valueInPx = maxScroll * floatValue / 100;
@@ -524,7 +528,7 @@ function omit(object, keysToOmit) {
 
 // Main update function
 // Returns new state object based on props and scroll position
-function getNewState(scrollPosition, props, state, element, customMaxScroll) {
+function getNewState(scrollPosition, props, state, element) {
   const {
     animateWhenNotInViewport,
     disabled,
@@ -545,6 +549,7 @@ function getNewState(scrollPosition, props, state, element, customMaxScroll) {
 
   // Check if element is in viewport
   // Small offset is added to prevent page jumping
+  // TODO
   if (!animateWhenNotInViewport) {
     const rect = element.getBoundingClientRect();
     const isTopAboveBottomEdge = rect.top < window.innerHeight + SCROLL_OFFSET;
@@ -761,7 +766,7 @@ export default class Plx extends Component {
       window.addEventListener('window-scroll', this.handleScrollChange);
     }
 
-    console.log('wookkkk3');
+    console.log('wookkkk4');
 
     // Add listeners
     window.addEventListener('resize', this.handleResize);
@@ -824,6 +829,7 @@ export default class Plx extends Component {
   handleResize() {
     clearTimeout(this.resizeDebounceTimeoutID);
     this.resizeDebounceTimeoutID = setTimeout(() => {
+      // TODO
       this.update();
     }, RESIZE_DEBOUNCE_TIMEOUT);
   }
