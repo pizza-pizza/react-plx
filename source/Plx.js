@@ -169,6 +169,10 @@ const PROPS_TO_OMIT = [
   'tagName',
   'onPlxStart',
   'onPlxEnd',
+  'maxScroll',
+  'scrollElement',
+  'calculateInitialScrollPosition',
+  'calculateScrollPosition'
 ];
 
 // Get element's top offset
@@ -274,9 +278,6 @@ function convertPropToPixels(propName, propValue, maxScroll, offset = 0) {
   if (propValueInPx < 0) {
     propValueInPx = 0;
   }
-
-  //TODO
-  console.log(propName, propValueInPx);
 
   return propValueInPx;
 }
@@ -552,7 +553,6 @@ function getNewState(scrollPosition, props, state, element) {
 
   // Check if element is in viewport
   // Small offset is added to prevent page jumping
-  // TODO
   if (!animateWhenNotInViewport) {
     const rect = element.getBoundingClientRect();
     const isTopAboveBottomEdge = rect.top < window.innerHeight + SCROLL_OFFSET;
@@ -626,8 +626,6 @@ function getNewState(scrollPosition, props, state, element) {
     if (isScrolledByStart) {
       lastSegmentScrolledBy = i;
     }
-
-    console.log(scrollPosition, startInPx, endInPx);
 
     // If active segment exists, apply his properties
     if (scrollPosition >= startInPx && scrollPosition <= endInPx) {
@@ -744,6 +742,7 @@ export default class Plx extends Component {
     // Custom scroll element & calculation
     this.scrollElement = props.scrollElement;
     this.calculateScrollPosition = props.calculateScrollPosition;
+    this.calculateInitialScrollPosition = props.calculateInitialScrollPosition;
 
     // Binding handlers
     this.handleScrollChange = this.handleScrollChange.bind(this);
@@ -770,8 +769,6 @@ export default class Plx extends Component {
     } else {
       window.addEventListener('window-scroll', this.handleScrollChange);
     }
-
-    console.log('wookkkk4');
 
     // Add listeners
     window.addEventListener('resize', this.handleResize);
@@ -816,8 +813,15 @@ export default class Plx extends Component {
   }
 
   update(scrollPosition = null) {
-    const currentScrollPosition = scrollPosition === null ?
-      this.scrollManager.getScrollPosition().scrollPositionY : scrollPosition;
+    let currentScrollPosition = scrollPosition;
+
+    if (currentScrollPosition === null) {
+      if (this.scrollElement) {
+        currentScrollPosition = this.calculateInitialScrollPosition(this.scrollElement);
+      } else {
+        this.scrollManager.getScrollPosition().scrollPositionY;
+      }
+    }
 
     const newState = getNewState(
       currentScrollPosition,
@@ -834,7 +838,6 @@ export default class Plx extends Component {
   handleResize() {
     clearTimeout(this.resizeDebounceTimeoutID);
     this.resizeDebounceTimeoutID = setTimeout(() => {
-      // TODO
       this.update();
     }, RESIZE_DEBOUNCE_TIMEOUT);
   }
