@@ -868,6 +868,17 @@ export default class Plx extends Component {
 
     let elementStyle = style;
 
+    // check if htmlContent is supposed to be updated
+    if (typeof plxStyle.htmlContent !== 'undefined') {
+      const numberString = Math.round(plxStyle.htmlContent).toString();
+
+      // set html content, each character in a separate span
+      this.element.innerHTML = [...numberString].reduce(
+        (str, char) => `${str}<span>${char}</span>`,
+        ''
+      );
+    }
+
     if (!disabled) {
       elementStyle = {
         ...style,
